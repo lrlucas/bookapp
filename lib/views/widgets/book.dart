@@ -22,31 +22,22 @@ class BookCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (imageUrl != null)
-            Image.network(
-              imageUrl!,
-              height: 200,
-              width: double.infinity,
-              fit: BoxFit.cover,
-              loadingBuilder: (context, child, loadingProgress) {
-                if (loadingProgress == null) return child;
-                return const Center(
-                  child: CircularProgressIndicator.adaptive(),
-                );
-              },
-              errorBuilder: (context, error, stackTrace) {
-                return const Icon(Icons.error);
-              },
-            )
-          else if (localImagePath != null)
-            Image.asset(
-              localImagePath!,
-              height: 200,
-              width: double.infinity,
-              // fit: BoxFit.cover,
-            ),
+          Image.network(
+            imageUrl!,
+            height: 200,
+            width: double.infinity,
+            fit: BoxFit.cover,
+            loadingBuilder: (context, child, loadingProgress) {
+              if (loadingProgress == null) return child;
+              return const Center(
+                child: CircularProgressIndicator.adaptive(),
+              );
+            },
+            errorBuilder: (context, error, stackTrace) {
+              return const Icon(Icons.error);
+            },
+          ),
           Padding(
-            // padding: const EdgeInsets.all(5.0),
             padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 8.0),
             child: Text(
               title,
@@ -54,7 +45,6 @@ class BookCard extends StatelessWidget {
             ),
           ),
           Padding(
-            // padding: const EdgeInsets.all(5.0),
             padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
             child: Text(
               subtitle,

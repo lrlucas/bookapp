@@ -1,6 +1,9 @@
+import 'package:book_app/blocs/book_bloc.dart';
+import 'package:book_app/repositories/book_repository.dart';
 import 'package:book_app/views/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() {
   // runApp(const MyApp());
@@ -15,7 +18,8 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
+  final BookRepository _bookRepository = BookRepository();
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +30,10 @@ class MyApp extends StatelessWidget {
       //   colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       //   useMaterial3: true,
       // ),
-      home: HomePage(),
+      home: BlocProvider(
+        create: (context) => BookBloc(_bookRepository),
+        child: HomePage(),
+      ),
     );
   }
 }

@@ -15,6 +15,37 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final BookRepository _bookRepository = BookRepository();
+  TextEditingController _searchController = TextEditingController();
+  FocusNode _focusNode = FocusNode();
+
+  bool _isFocused = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(() {
+      setState(() {
+        _isFocused = _focusNode.hasFocus;
+      });
+    });
+    _searchController.addListener(() {
+      context.read<BookBloc>().filterBooks(_searchController.text);
+    });
+  }
+
+  void _clearSearch() {
+    _searchController.clear();
+    context.read<BookBloc>().clearFilter();
+    FocusScope.of(context).unfocus();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,6 +63,29 @@ class _HomePageState extends State<HomePage> {
       body: Column(
         children: [
           const SizedBox(height: 24),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: TextField(
+              controller: _searchController,
+              focusNode: _focusNode,
+              cursorColor: Colors.green,
+              decoration: InputDecoration(
+                focusedBorder: const OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.green, width: 1.0),
+                ),
+                labelText: 'Search',
+                floatingLabelStyle: TextStyle(color: Colors.green),
+                border: const OutlineInputBorder(),
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.close,
+                      color: _isFocused ? Colors.green : Colors.grey),
+                  focusColor: Colors.green,
+                  onPressed: _clearSearch,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
           const Row(
             children: [
               SizedBox(width: 10),
@@ -48,14 +102,10 @@ class _HomePageState extends State<HomePage> {
           const Divider(thickness: 0.8),
           const SizedBox(height: 10),
           Expanded(
-            child: BlocProvider(
-              create: (context) => BookBloc(_bookRepository),
-              child: BookGrid(),
-            ),
+            child: BookGrid(),
           ),
         ],
       ),
-      // body: BookGrid(),
     );
   }
 }
@@ -99,10 +149,8 @@ class _BookGridState extends State<BookGrid> {
     bookBloc.fetchBooks();
     return BlocBuilder<BookBloc, List<Book>>(
       builder: (context, books) {
-        print('VISTA');
-        print(books.length);
         if (books.isEmpty) {
-          return const Center(child: CircularProgressIndicator.adaptive());
+          return const Center(child: Text('No hay libros disponibles'));
         }
 
         return GridView.builder(
@@ -117,7 +165,6 @@ class _BookGridState extends State<BookGrid> {
             final data = books[index];
             return GestureDetector(
               onTap: () {
-                print('Click para ir al detalle');
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -128,7 +175,6 @@ class _BookGridState extends State<BookGrid> {
                 );
               },
               child: BookCard(
-                // localImagePath: 'assets/images/book_1.jpg',
                 imageUrl: data.imageUrl,
                 title: data.title,
                 authors: data.authors,
